@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <print>
-
+// separate everything into each function
 
 void Menu::renderSelected()
 {
