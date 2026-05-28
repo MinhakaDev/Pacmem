@@ -9,7 +9,7 @@ TypeSelectPanel::TypeSelectPanel(UIContext& ui, Scanner& sc)
 }
 void TypeSelectPanel::draw()
 {
-	const char* types[] = { "int32", "int64", "float", "double", "uint8" };
+	const char* types[] = { "int32", "int64", "float" };
 
 	ImGui::Combo("Type", &ui.selectedType, types, IM_ARRAYSIZE(types));
 

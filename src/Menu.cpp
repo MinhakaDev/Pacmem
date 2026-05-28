@@ -89,7 +89,7 @@ bool Menu::update()
 
 
 
-	ImGui::Begin("pacmem - test");
+	ImGui::Begin("Pacmem");
 	renderToolbar();
 	ImGui::Separator();
 	renderResults();
