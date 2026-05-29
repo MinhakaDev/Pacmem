@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <cstring>
 #include <fstream>
+#include <unordered_map>
 #include <vector>
 #include <iostream>
 #include <print>
@@ -17,13 +18,18 @@ struct MemorySnapshot
 	uintptr_t start;
 	std::vector<uint8_t> bytes;
 };
+struct memoryBeforeValues
+{
+	uintptr_t memoryAddr;
+	int value;
+};
 class Scanner
 {
 	private:
 		Process proc;
 		std::vector<MemorySnapshot> memorySnapshot;
 		std::vector<uintptr_t> memoryAddrList;
-		std::any valueBefore;
+		std::unordered_map<uintptr_t, int64_t> memoryValuesBefore;
 	public:
 	Scanner();
 	
@@ -48,6 +54,7 @@ class Scanner
 				if (tempValue == target) 
 				{
 					Scanner::memoryAddrList.push_back(memoryAddr);
+					saveMemoryValue(memoryAddr, target);
 				}
 			}
 		
@@ -57,24 +64,25 @@ class Scanner
 	template<typename T>
 	void scanUnknown()
 	{
+		T tempValue;
+		if (!Scanner::newScan()) 
 		{
-			T tempValue;
-			if (!Scanner::newScan()) 
-			{
-				std::println("error 1");
-			}
-			std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
+			std::println("error 1");
+		}
+		const std::vector<MemorySnapshot>& snapshotBefore = Scanner::memorySnapshot;
 
-			for (int i = 0; snapshotBefore.size() > i ; i++)
+		for (int i = 0; snapshotBefore.size() > i ; i++)
+		{
+			for (int j = 0; snapshotBefore[i].bytes.size() > j; j++) 
 			{
-				for (int j = 0; snapshotBefore[i].bytes.size() > j; j++) 
+				std::memcpy(&tempValue, snapshotBefore[i].bytes.data() + j,sizeof(tempValue));
+				uintptr_t memoryAddr = snapshotBefore[i].start + j;
+				if(tempValue > 1)
 				{
-					std::memcpy(&tempValue, snapshotBefore[i].bytes.data() + j,sizeof(tempValue));
-					uintptr_t memoryAddr = snapshotBefore[i].start + j;
 					Scanner::memoryAddrList.push_back(memoryAddr);
 				}
-
 			}
+
 		}
 	}
 
@@ -93,45 +101,47 @@ class Scanner
 			}
 		}
 		Scanner::proc.detatch();
-		valueBefore = tempValue;
 		Scanner::memoryAddrList = newMemoryAddrList;
 		return true;
 	}
 	
 	template<typename T>
-	bool rescanGreater(T target)
+	bool rescanGreater()
 	{
 		std::vector<uintptr_t> newMemoryAddrList;
 		Scanner::proc.attatch();
+		std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
 		for (int i = 0; Scanner::memoryAddrList.size() > i; i++) 
 		{
+			T beforeValue = getMemoryValueBefore<T>(memoryAddrList[i]);
 			T value = readValue<T>(memoryAddrList[i]);
-			if (target > value) 
+			if (beforeValue < value) 
 			{
 				newMemoryAddrList.push_back(Scanner::memoryAddrList[i]);
+				changeMemoryValueBefore(memoryAddrList[i], value);
 			}
 		}
 		Scanner::proc.detatch();
-		valueBefore = target;
 		memoryAddrList = newMemoryAddrList;
 		return true;
 	}
 	template<typename T>
-
-	bool rescanLower(T target)
+	bool rescanLower()
 	{
 		std::vector<uintptr_t> newMemoryAddrList;
 		Scanner::proc.attatch();
+		std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
 		for (int i = 0; Scanner::memoryAddrList.size() > i; i++) 
 		{
+			T beforeValue = getMemoryValueBefore<T>(memoryAddrList[i]);
 			T value = readValue<T>(memoryAddrList[i]);
-			if (target < value) 
+			if (beforeValue > value) 
 			{
 				newMemoryAddrList.push_back(Scanner::memoryAddrList[i]);
+				changeMemoryValueBefore(memoryAddrList[i], value);
 			}
 		}
 		Scanner::proc.detatch();
-		valueBefore = target;
 		memoryAddrList = newMemoryAddrList;
 		return true;
 	}
@@ -143,10 +153,12 @@ class Scanner
 		Scanner::proc.attatch();
 		for (int i = 0; Scanner::memoryAddrList.size() > i; i++) 
 		{
+			T beforeValue = getMemoryValueBefore<T>(memoryAddrList[i]);
 			T value = readValue<T>(memoryAddrList[i]);
-			if (valueBefore == value) 
+			if (beforeValue == value) 
 			{
 				newMemoryAddrList.push_back(Scanner::memoryAddrList[i]);
+				changeMemoryValueBefore(memoryAddrList[i], value);
 			}
 		}
 		Scanner::proc.detatch();
@@ -162,6 +174,22 @@ class Scanner
 		Scanner::proc.attatch();
 		proc.writeMemory(Scanner::memoryAddrList[index], data);
 		Scanner::proc.detatch();
+	}
+
+	template <typename T>
+	void saveMemoryValue(uintptr_t memoryAddr, T value)
+	{
+	    memoryValuesBefore[memoryAddr] = static_cast<int64_t>(value);
+	}
+	template <typename T>
+	T getMemoryValueBefore(uintptr_t memoryAddr)
+	{
+	    return static_cast<T>(memoryValuesBefore[memoryAddr]);
+	}
+	template <typename T>
+	void changeMemoryValueBefore(uintptr_t memoryAddr, T value)
+	{
+	    memoryValuesBefore[memoryAddr] = static_cast<int64_t>(value);
 	}
 
 	template <typename T>
