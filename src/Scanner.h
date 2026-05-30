@@ -30,6 +30,7 @@ class Scanner
 		std::vector<MemorySnapshot> memorySnapshot;
 		std::vector<uintptr_t> memoryAddrList;
 		std::unordered_map<uintptr_t, int64_t> memoryValuesBefore;
+		bool firstScan = false;
 	public:
 	Scanner();
 	
@@ -70,20 +71,8 @@ class Scanner
 			std::println("error 1");
 		}
 		const std::vector<MemorySnapshot>& snapshotBefore = Scanner::memorySnapshot;
-
-		for (int i = 0; snapshotBefore.size() > i ; i++)
-		{
-			for (int j = 0; snapshotBefore[i].bytes.size() > j; j++) 
-			{
-				std::memcpy(&tempValue, snapshotBefore[i].bytes.data() + j,sizeof(tempValue));
-				uintptr_t memoryAddr = snapshotBefore[i].start + j;
-				if(tempValue > 1)
-				{
-					Scanner::memoryAddrList.push_back(memoryAddr);
-				}
-			}
-
-		}
+		firstScan = true;
+		
 	}
 
 	template <typename T>
@@ -108,6 +97,37 @@ class Scanner
 	template<typename T>
 	bool rescanGreater()
 	{
+		if (firstScan)
+		{
+			std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
+			newScan();
+			std::vector<MemorySnapshot>& newSnapshot = Scanner::memorySnapshot;
+			T before;
+			T after;
+			std::vector<uintptr_t> newMemoryAddrList;
+			for(int i = 0; i < snapshotBefore.size(); i++)
+			{
+				std::println("i = {} de {}",i,snapshotBefore.size());
+				for (int j = 0; j < snapshotBefore[i].bytes.size(); j++ )
+				{
+					if (snapshotBefore[i].start == newSnapshot[i].start)
+					{
+						std::memcpy(&before, snapshotBefore[i].bytes.data() + j, sizeof(before));
+						std::memcpy(&after, newSnapshot[i].bytes.data() + j, sizeof(after));
+						uintptr_t memoryAddr = newSnapshot[i].start + j;
+						if (after > before)
+						{
+							newMemoryAddrList.push_back(memoryAddr);
+							saveMemoryValue(memoryAddr, after);
+						}
+					}
+				}
+			}
+			memoryAddrList = newMemoryAddrList;
+			firstScan = false;
+			return true;
+		}
+
 		std::vector<uintptr_t> newMemoryAddrList;
 		Scanner::proc.attatch();
 		std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
@@ -128,6 +148,36 @@ class Scanner
 	template<typename T>
 	bool rescanLower()
 	{
+				if (firstScan)
+		{
+			std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
+			newScan();
+			std::vector<MemorySnapshot>& newSnapshot = Scanner::memorySnapshot;
+			T before;
+			T after;
+			std::vector<uintptr_t> newMemoryAddrList;
+			for(int i = 0; i < snapshotBefore.size(); i++)
+			{
+				std::println("i = {} de {}",i,snapshotBefore.size());
+				for (int j = 0; j < snapshotBefore[i].bytes.size(); j++ )
+				{
+					if (snapshotBefore[i].start == newSnapshot[i].start)
+					{
+						std::memcpy(&before, snapshotBefore[i].bytes.data() + j, sizeof(before));
+						std::memcpy(&after, newSnapshot[i].bytes.data() + j, sizeof(after));
+						uintptr_t memoryAddr = newSnapshot[i].start + j;
+						if (after < before)
+						{
+							newMemoryAddrList.push_back(memoryAddr);
+							saveMemoryValue(memoryAddr, after);
+						}
+					}
+				}
+			}
+			memoryAddrList = newMemoryAddrList;
+			firstScan = false;
+			return true;
+		}
 		std::vector<uintptr_t> newMemoryAddrList;
 		Scanner::proc.attatch();
 		std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;

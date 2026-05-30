@@ -127,8 +127,8 @@ bool Menu::update()
 			std::println("button rescan clicked");
 			switch (selectedType) {
 				case 0: sc.scanUnknown<int32_t>(); break;
-				case 1: sc.rescanExact<int64_t>(std::stoll(searchInput)); break;
-				case 2: sc.rescanExact<float>(std::stof(searchInput)); break;
+				case 1: sc.scanUnknown<int64_t>(); break;
+				case 2: sc.scanUnknown<float>(); break;
 			}
 		} catch (...) {
 			// invalid input, do nothing
@@ -139,8 +139,8 @@ bool Menu::update()
 			std::println("button rescan clicked");
 			switch (selectedType) {
 				case 0: sc.rescanLower<int32_t>(); break;
-				case 1: sc.rescanExact<int64_t>(std::stoll(searchInput)); break;
-				case 2: sc.rescanExact<float>(std::stof(searchInput)); break;
+				case 1: sc.rescanLower<int64_t>(); break;
+				case 2: sc.rescanLower<float>(); break;
 			}
 		} catch (...) {
 			// invalid input, do nothing
@@ -151,8 +151,20 @@ bool Menu::update()
 			std::println("Higher");
 			switch (selectedType) {
 				case 0: sc.rescanGreater<int32_t>(); break;
-				case 1: sc.rescanExact<int64_t>(std::stoll(searchInput)); break;
-				case 2: sc.rescanExact<float>(std::stof(searchInput)); break;
+				case 1: sc.rescanGreater<int64_t>(); break;
+				case 2: sc.rescanGreater<float>(); break;
+			}
+		} catch (...) {
+			// invalid input, do nothing
+		}
+	}
+	if (ImGui::Button("Same") && searchInput[0] != '\0') {
+		try {
+			std::println("Same");
+			switch (selectedType) {
+				case 0: sc.rescanSame<int32_t>(); break;
+				case 1: sc.rescanSame<int64_t>(); break;
+				case 2: sc.rescanSame<float>(); break;
 			}
 		} catch (...) {
 			// invalid input, do nothing
