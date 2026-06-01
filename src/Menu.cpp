@@ -44,6 +44,7 @@ void Menu::renderResults()
                 case 0: ImGui::Text("%d",  sc.getMemoryValue<int32_t>(memoryAddrList[i])); break;
                 case 1: ImGui::Text("%lld", sc.getMemoryValue<int64_t>(memoryAddrList[i])); break;
                 case 2: ImGui::Text("%f",  sc.getMemoryValue<float>(memoryAddrList[i])); break;
+		case 3: ImGui::Text("0x%llX", sc.getMemoryValue<uintptr_t>(memoryAddrList[i])); break;
             }
         }
 
@@ -57,6 +58,7 @@ void Menu::renderResults()
                         case 0: sc.write<int32_t>(selectedIndex, std::stoi(editInput)); break;
                         case 1: sc.write<int64_t>(selectedIndex, std::stoll(editInput)); break;
                         case 2: sc.write<float>(selectedIndex, std::stof(editInput)); break;
+			case 3: sc.write<uintptr_t>(selectedIndex, std::stof(editInput)); break;
                     }
                 } catch (...) {}
                 ImGui::CloseCurrentPopup();
@@ -73,7 +75,7 @@ void Menu::renderResults()
 
 void Menu::renderToolbar()
 {
-	const char* types[] = { "int32", "int64", "float", "double", "uint8" };
+	const char* types[] = { "int32", "int64", "float", "uintptr_t" };
 
 	ImGui::Combo("Type", &selectedType, types, IM_ARRAYSIZE(types));
 
@@ -104,6 +106,8 @@ bool Menu::update()
 				case 0: sc.scanExact<int32_t>(std::stoi(searchInput)); break;
 				case 1: sc.scanExact<int64_t>(std::stoll(searchInput)); break;
 				case 2: sc.scanExact<float>(std::stof(searchInput)); break;
+				case 3: sc.scanExact<uintptr_t>(std::stoull(searchInput, nullptr, 16)); break;
+
 			}
 		} catch (...) {
 			// invalid input, do nothing
@@ -117,6 +121,7 @@ bool Menu::update()
 				case 0: sc.rescanExact<int32_t>(std::stoi(searchInput)); break;
 				case 1: sc.rescanExact<int64_t>(std::stoll(searchInput)); break;
 				case 2: sc.rescanExact<float>(std::stof(searchInput)); break;
+				case 3: sc.rescanExact<uintptr_t>(std::stoull(searchInput, nullptr, 16)); break;
 			}
 		} catch (...) {
 			// invalid input, do nothing

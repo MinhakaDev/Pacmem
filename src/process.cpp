@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <sys/ptrace.h>
+#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
@@ -144,7 +145,7 @@ void Process::detatch()
 std::vector<uint8_t> Process::readMemory(uintptr_t memoryAddr, size_t size)
 {
 	std::vector<uint8_t> buffer(size);
-	pread(mem_fd, buffer.data(), size, memoryAddr);
+	ssize_t bytesRead = pread(mem_fd, buffer.data(), size, memoryAddr);
 	return buffer;
 }
 

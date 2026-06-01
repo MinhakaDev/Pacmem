@@ -123,6 +123,7 @@ class Scanner
 					}
 				}
 			}
+			Scanner::memorySnapshot.clear();
 			memoryAddrList = newMemoryAddrList;
 			firstScan = false;
 			return true;
@@ -174,6 +175,7 @@ class Scanner
 					}
 				}
 			}
+			Scanner::memorySnapshot.clear();
 			memoryAddrList = newMemoryAddrList;
 			firstScan = false;
 			return true;
