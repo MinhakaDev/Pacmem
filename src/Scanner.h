@@ -74,7 +74,6 @@ class Scanner
 		firstScan = true;
 		
 	}
-
 	template <typename T>
 		bool rescanExact(T target)
 		{
@@ -217,6 +216,27 @@ class Scanner
 		memoryAddrList = newMemoryAddrList;
 		return true;
 	}
+	template<typename T>
+	bool rescanChanged()
+	{
+		std::vector<uintptr_t> newMemoryAddrList;
+		Scanner::proc.attatch();
+		for (int i = 0; Scanner::memoryAddrList.size() > i; i++) 
+		{
+			T beforeValue = getMemoryValueBefore<T>(memoryAddrList[i]);
+			T value = readValue<T>(memoryAddrList[i]);
+			if (beforeValue != value) 
+			{
+				newMemoryAddrList.push_back(Scanner::memoryAddrList[i]);
+				changeMemoryValueBefore(memoryAddrList[i], value);
+			}
+		}
+		Scanner::proc.detatch();
+		memoryAddrList = newMemoryAddrList;
+		return true;
+	}
+
+
 
 	template <typename T>
 	void write(int index, T value)

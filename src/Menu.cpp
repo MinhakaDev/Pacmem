@@ -176,6 +176,21 @@ bool Menu::update()
 		}
 	}
 
+	if (ImGui::Button("Changed") && searchInput[0] != '\0') {
+		try {
+			switch (selectedType) {
+				case 0: sc.rescanChanged<int32_t>(); break;
+				case 1: sc.rescanChanged<int64_t>(); break;
+				case 2: sc.rescanChanged<float>(); break;
+			}
+		} catch (...) {
+			// invalid input, do nothing
+		}
+	}
+
+
+
+
 	ImGui::End();
 
 
