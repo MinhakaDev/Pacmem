@@ -1,77 +1,12 @@
 #include "Menu.h"
+#include "Panels/MemoryScanned.h"
 #include "imgui.h"
 #include <cstdint>
 #include <cstdlib>
 #include <print>
 // separate everything into each function
 
-void Menu::renderSelected()
-{
-}
 
-void Menu::renderResults()
-{
-    std::vector<uintptr_t> memoryAddrList = sc.getMemoryAddrList();
-    
-    if (ImGui::BeginTable("results", 2, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg))
-    {
-        ImGui::TableSetupColumn("Address");
-        ImGui::TableSetupColumn("Value");
-        ImGui::TableHeadersRow();
-
-        int totalPages = (memoryAddrList.size() + perPage - 1) / perPage;
-        int start = currentPage * perPage;
-        int end = std::min(start + perPage, (int)memoryAddrList.size());
-
-        for (int i = start; i < end; i++)
-        {
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-
-            bool selected = (selectedIndex == i);
-            char label[32];
-            snprintf(label, sizeof(label), "0x%llX", memoryAddrList[i]);
-
-            if (ImGui::Selectable(label, selected, ImGuiSelectableFlags_SpanAllColumns))
-                selectedIndex = i;
-
-            if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-                ImGui::OpenPopup("edit_value");
-
-            ImGui::TableSetColumnIndex(1);
-            switch (selectedType)
-            {
-                case 0: ImGui::Text("%d",  sc.getMemoryValue<int32_t>(memoryAddrList[i])); break;
-                case 1: ImGui::Text("%lld", sc.getMemoryValue<int64_t>(memoryAddrList[i])); break;
-                case 2: ImGui::Text("%f",  sc.getMemoryValue<float>(memoryAddrList[i])); break;
-		case 3: ImGui::Text("0x%llX", sc.getMemoryValue<uintptr_t>(memoryAddrList[i])); break;
-            }
-        }
-
-        if (ImGui::BeginPopup("edit_value"))
-        {
-            ImGui::InputText("New Value", editInput, sizeof(editInput));
-            if (ImGui::Button("Write"))
-            {
-                try {
-                    switch (selectedType) {
-                        case 0: sc.write<int32_t>(selectedIndex, std::stoi(editInput)); break;
-                        case 1: sc.write<int64_t>(selectedIndex, std::stoll(editInput)); break;
-                        case 2: sc.write<float>(selectedIndex, std::stof(editInput)); break;
-			case 3: sc.write<uintptr_t>(selectedIndex, std::stof(editInput)); break;
-                    }
-                } catch (...) {}
-                ImGui::CloseCurrentPopup();
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
-            ImGui::EndPopup();
-        }
-
-        ImGui::EndTable();
-    }
-
-}
 
 void Menu::renderToolbar()
 {
@@ -83,20 +18,22 @@ void Menu::renderToolbar()
 
 bool Menu::update()
 {
+	MemoryScanned memoryScannedPannel(ui,sc);
+	
 	glfwPollEvents();
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGuiID dock_id = ImGui::DockSpaceOverViewport();
+	ImGui::SetNextWindowDockID(dock_id, ImGuiCond_FirstUseEver);
 
-
+	memoryScannedPannel.draw();
 
 	ImGui::Begin("Pacmem");
 	renderToolbar();
 	ImGui::Separator();
-	renderResults();
 	ImGui::Separator();
-	renderSelected();
 	//deletar dps
 	ImGui::InputText("Value", searchInput, sizeof(searchInput));
 	if (ImGui::Button("Scan") && searchInput[0] != '\0') {
@@ -190,9 +127,7 @@ bool Menu::update()
 
 
 
-
 	ImGui::End();
-
 
 	ImGui::Render();
 	int w, h;
@@ -212,6 +147,7 @@ bool Menu::update()
 
 Menu::Menu()
 {
+	searchInput[0] = '\0';
 	if (!glfwInit())
 	{
 		std::println("error creating glwINIT");
@@ -228,6 +164,8 @@ Menu::Menu()
 
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 	ImGui::StyleColorsDark();

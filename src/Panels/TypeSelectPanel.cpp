@@ -1,11 +1,10 @@
 #include "TypeSelectPanel.h"
-#include "Scanner.h"
-#include "UIContext.h"
 
 
 TypeSelectPanel::TypeSelectPanel(UIContext& ui, Scanner& sc) 
 	:ui(ui),sc(sc)
 {
+
 }
 void TypeSelectPanel::draw()
 {

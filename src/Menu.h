@@ -8,14 +8,16 @@
 #include "imgui_impl_opengl3.h"
 #include <cstdio>
 #include "Scanner.h"
+#include "UIContext.h"
+#include "./Panels/TypeSelectPanel.h"
+#include "./Panels/MemoryScanned.h"
 
 class Menu
 {
 	private:
 		Scanner sc;
 		void renderToolbar();
-		void renderResults();
-		void renderSelected();
+		UIContext ui;
 
 		GLFWwindow* window;
 

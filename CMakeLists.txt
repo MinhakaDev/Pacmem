@@ -10,7 +10,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)  # <-- critical for your LSP (clangd)
 
 include(cmake/ImGui.cmake)
 
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB_RECURSE SOURCES "src/*.cpp")
 add_executable(pacmem
 	${SOURCES}
 )
