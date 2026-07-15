@@ -1,5 +1,8 @@
 #include "MemoryScanned.h"
 #include "imgui.h"
+#include "TypeRegistry.h"
+#include <print>
+#include "ErrorReporter.h"
 
 
 
@@ -38,13 +41,7 @@ void MemoryScanned::draw()
 		ImGui::OpenPopup("edit_value");
 
 	    ImGui::TableSetColumnIndex(1);
-	    switch (selectedType)
-	    {
-		case 0: ImGui::Text("%d",  sc.getMemoryValue<int32_t>(memoryAddrList[i])); break;
-		case 1: ImGui::Text("%lld", sc.getMemoryValue<int64_t>(memoryAddrList[i])); break;
-		case 2: ImGui::Text("%f",  sc.getMemoryValue<float>(memoryAddrList[i])); break;
-		case 3: ImGui::Text("0x%llX", sc.getMemoryValue<uintptr_t>(memoryAddrList[i])); break;
-	    }
+	    types[ui.selectedType].renderMemoryValue(sc,memoryAddrList[i]);
 	}
 
 	if (ImGui::BeginPopup("edit_value"))
@@ -53,13 +50,8 @@ void MemoryScanned::draw()
 	    if (ImGui::Button("Write"))
 	    {
 		try {
-		    switch (selectedType) {
-			case 0: sc.write<int32_t>(selectedIndex, std::stoi(editInput)); break;
-			case 1: sc.write<int64_t>(selectedIndex, std::stoll(editInput)); break;
-			case 2: sc.write<float>(selectedIndex, std::stof(editInput)); break;
-			case 3: sc.write<uintptr_t>(selectedIndex, std::stof(editInput)); break;
-		    }
-		} catch (...) {}
+			types[ui.selectedType].writeMemory(sc, selectedIndex, editInput);
+		} catch (...) {ErrorReporter::warning("Could Not Write to memory");}
 		ImGui::CloseCurrentPopup();
 	    }
 	    ImGui::SameLine();
