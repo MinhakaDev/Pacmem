@@ -18,7 +18,6 @@ void Menu::renderToolbar()
 
 bool Menu::update()
 {
-	MemoryScanned memoryScannedPannel(ui,sc);
 	
 	glfwPollEvents();
 

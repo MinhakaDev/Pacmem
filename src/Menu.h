@@ -16,8 +16,9 @@ class Menu
 {
 	private:
 		Scanner sc;
-		void renderToolbar();
 		UIContext ui;
+		MemoryScanned memoryScannedPannel{ui,sc};
+		void renderToolbar();
 
 		GLFWwindow* window;
 

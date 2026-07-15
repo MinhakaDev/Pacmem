@@ -1,5 +1,6 @@
 #pragma once
 #include "./process.h"
+#include "ErrorReporter.h"
 #include <any>
 #include <cstdint>
 #include <cstring>
