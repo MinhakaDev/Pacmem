@@ -11,6 +11,7 @@
 #include "UIContext.h"
 #include "./Panels/TypeSelectPanel.h"
 #include "./Panels/MemoryScanned.h"
+#include "./Panels/MainPanel.h"
 
 class Menu
 {
@@ -18,7 +19,7 @@ class Menu
 		Scanner sc;
 		UIContext ui;
 		MemoryScanned memoryScannedPannel{ui,sc};
-		void renderToolbar();
+		MainPanel mainPanel{ui,sc};
 
 		GLFWwindow* window;
 
@@ -27,7 +28,6 @@ class Menu
 		int selectedType = 0;
 		int scanValue = 0;
 		static const int perPage = 20;
-		char searchInput[32];
 		char editInput[32];
 
 	public:
