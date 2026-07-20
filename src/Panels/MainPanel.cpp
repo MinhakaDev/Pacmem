@@ -45,12 +45,7 @@ void MainPanel::draw()
 		try
 		{
 			std::println("button rescan clicked");
-			switch (selectedType) {
-				case 0: sc.rescanExact<int32_t>(std::stoi(searchInput)); break;
-				case 1: sc.rescanExact<int64_t>(std::stoll(searchInput)); break;
-				case 2: sc.rescanExact<float>(std::stof(searchInput)); break;
-				case 3: sc.rescanExact<uintptr_t>(std::stoull(searchInput, nullptr, 16)); break;
-			}
+			types[ui.selectedType].rescanExact(sc,searchInput);
 		} catch (...)
 		{
 			// invalid input, do nothing
