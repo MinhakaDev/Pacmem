@@ -12,6 +12,7 @@
 #include "./Panels/TypeSelectPanel.h"
 #include "./Panels/MemoryScanned.h"
 #include "./Panels/MainPanel.h"
+#include "./Panels/MenuPanel.h"
 
 class Menu
 {
@@ -20,7 +21,8 @@ class Menu
 		UIContext ui;
 		MemoryScanned memoryScannedPannel{ui,sc};
 		MainPanel mainPanel{ui,sc};
-
+		MenuPanel menuPanel;
+ 
 		GLFWwindow* window;
 
 		int currentPage = 0;

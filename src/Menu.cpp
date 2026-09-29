@@ -9,13 +9,20 @@
 
 
 bool Menu::update()
-{
+{		
+	if(glfwWindowShouldClose(window))
+	{
+		return false;
+	}
+
 	
 	glfwPollEvents();
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	menuPanel.draw();
+
 	ImGuiID dock_id = ImGui::DockSpaceOverViewport();
 	ImGui::SetNextWindowDockID(dock_id, ImGuiCond_FirstUseEver);
 
@@ -33,10 +40,7 @@ bool Menu::update()
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	glfwSwapBuffers(window);
 
-	if(glfwWindowShouldClose(window))
-	{
-		return false;
-	}
+
 	return true;
 }
 
@@ -60,9 +64,11 @@ Menu::Menu()
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");
 	ImGui::StyleColorsDark();
+
 }
 
 Menu::~Menu()
