@@ -16,24 +16,6 @@
 Process::Process()
 {
 	getAllNames();
-	while (true)
-	{
-		std::println("Please Give me the name of the process to connect: ");
-		for (int i = 0; i < processNames.size();i++)
-		{
-			std::println("{}",processNames[i]);
-		}
-		std::string name;
-		std::cin >> name;
-		getId(name);
-		if (Process::pid > 0 ) 
-		{
-			std::println("connected to the process {} with pid {}", name, Process::pid);
-			break;
-		}
-		ErrorReporter::error("There is no process with this name");
-		continue;
-	}
 }
 
 // retrun all current process names

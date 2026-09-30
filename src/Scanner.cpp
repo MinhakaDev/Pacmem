@@ -29,3 +29,18 @@ std::vector<uintptr_t> Scanner::getMemoryAddrList()
 {
 	return Scanner::memoryAddrList;
 }
+
+std::vector<std::string> Scanner::getProcessNames()
+{
+    return proc.getProcessNames();
+}
+
+void Scanner::processConnect(std::string procName)
+{
+    proc.getId(procName);
+}
+
+void Scanner::updateProcessNames()
+{
+    proc.getAllNames();
+}

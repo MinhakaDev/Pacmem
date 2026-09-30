@@ -13,6 +13,7 @@
 #include "./Panels/MemoryScanned.h"
 #include "./Panels/MainPanel.h"
 #include "./Panels/MenuPanel.h"
+#include "./Panels/ProcessPanel.h"
 
 class Menu
 {
@@ -22,6 +23,7 @@ class Menu
 		MemoryScanned memoryScannedPannel{ui,sc};
 		MainPanel mainPanel{ui,sc};
 		MenuPanel menuPanel;
+        ProcessPanel processPanel{sc};
  
 		GLFWwindow* window;
 

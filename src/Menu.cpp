@@ -21,13 +21,22 @@ bool Menu::update()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	menuPanel.draw();
-
 	ImGuiID dock_id = ImGui::DockSpaceOverViewport();
 	ImGui::SetNextWindowDockID(dock_id, ImGuiCond_FirstUseEver);
 
-	memoryScannedPannel.draw();
-	mainPanel.draw();
+    menuPanel.draw();
+    processPanel.draw();
+    switch (ui.screen)
+    {
+        case Screen::MAIN:
+            break;
+        case Screen::PROCESS:
+            memoryScannedPannel.draw();
+            mainPanel.draw();
+            break;
+        default:
+            break;
+    }
 
 
 
@@ -54,8 +63,9 @@ Menu::Menu()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	Menu::window = glfwCreateWindow(800, 600, "pacmem", nullptr, nullptr);
+    // get the monitor scale BEFORE creating the window
+    float scale = ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor()) * 2;
+	Menu::window = glfwCreateWindow(1080*scale, 1920*scale, "pacmem", nullptr, nullptr);
 	if (!window) { glfwTerminate();}
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
@@ -64,6 +74,10 @@ Menu::Menu()
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    //scaling
+    io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f * scale);
+    ImGui::GetStyle().ScaleAllSizes(scale);
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init("#version 330");

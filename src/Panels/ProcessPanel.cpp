@@ -1,5 +1,9 @@
 #include "ProcessPanel.h"
 #include "Scanner.h"
+#include "imgui.h"
+#include <cstddef>
+#include <print>
+#include <ErrorReporter.h>
 
 
 ProcessPanel::ProcessPanel(Scanner& sc) : sc(sc)
@@ -8,4 +12,50 @@ ProcessPanel::ProcessPanel(Scanner& sc) : sc(sc)
 
 void ProcessPanel::draw()
 {
+    ImGui::SetNextWindowSize(ImVec2(500,450), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(),ImGuiCond_FirstUseEver);
+
+    ImGui::Begin("Select Process", &showPicker, ImGuiWindowFlags_NoDocking);
+    std::vector<std::string> names  = sc.getProcessNames();
+    if (ImGui::BeginTable("Process List", 1, ImGuiTableFlags_ScrollY, ImVec2(400,300)))
+    {
+        ImGui::TableSetupScrollFreeze(0, 1);   // header stays visible
+        ImGui::TableSetupColumn("Name");
+        ImGui::TableHeadersRow();
+
+        std::vector<std::string> names  = sc.getProcessNames();
+        for (int i = 0; i < names.size(); i++)
+        {
+            if (names[i] == "pacmem") continue;
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            ImGui::PushID(i);
+            
+            if (ImGui::Selectable(names[i].c_str(),true, ImGuiSelectableFlags_AllowDoubleClick))
+            {
+                selectedIndex = i;
+                if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+                {
+                    sc.processConnect(names[selectedIndex]);
+                }
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+    if (ImGui::Button("Close"))
+    {
+    }
+    ImGui::SameLine(0,20);
+    if (ImGui::Button("Connect"))
+    {
+        sc.processConnect(names[selectedIndex]);
+    }
+    ImGui::SameLine(0,20);
+    if (ImGui::Button("Update"))
+    {
+
+    }
+
+    ImGui::End();
 }

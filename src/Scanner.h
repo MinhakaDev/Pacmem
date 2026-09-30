@@ -300,6 +300,9 @@ class Scanner
 
 	bool newScan();
 	std::vector<uintptr_t> getMemoryAddrList();
+    std::vector<std::string> getProcessNames();
+    void processConnect(std::string procName);
+    void updateProcessNames();
 };
 
 

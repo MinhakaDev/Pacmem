@@ -14,7 +14,6 @@ int main()
 	Menu menu;
 	while (menu.update())
 	{
-
 	}
 
 	return 0;
