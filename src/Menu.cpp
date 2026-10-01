@@ -25,10 +25,10 @@ bool Menu::update()
 	ImGui::SetNextWindowDockID(dock_id, ImGuiCond_FirstUseEver);
 
     menuPanel.draw();
-    processPanel.draw();
     switch (ui.screen)
     {
         case Screen::MAIN:
+            processPanel.draw();
             break;
         case Screen::PROCESS:
             memoryScannedPannel.draw();

@@ -4,9 +4,10 @@
 #include <cstddef>
 #include <print>
 #include <ErrorReporter.h>
+#include "UIContext.h"
 
 
-ProcessPanel::ProcessPanel(Scanner& sc) : sc(sc)
+ProcessPanel::ProcessPanel(Scanner& sc, UIContext& ui) : sc(sc),ui(ui)
 {
 }
 
@@ -37,6 +38,7 @@ void ProcessPanel::draw()
                 if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
                 {
                     sc.processConnect(names[selectedIndex]);
+                    ui.screen = Screen::PROCESS;
                 }
             }
             ImGui::PopID();
@@ -50,6 +52,7 @@ void ProcessPanel::draw()
     if (ImGui::Button("Connect"))
     {
         sc.processConnect(names[selectedIndex]);
+        ui.screen = Screen::PROCESS;
     }
     ImGui::SameLine(0,20);
     if (ImGui::Button("Update"))
