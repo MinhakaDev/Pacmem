@@ -1,6 +1,13 @@
 #include "MenuPanel.h"
+#include "UIContext.h"
 #include <imgui.h>
 #include <print>
+
+
+MenuPanel::MenuPanel(UIContext& ui): ui(ui)
+{
+}
+
 
 void MenuPanel::draw()
 {
@@ -14,6 +21,12 @@ void MenuPanel::draw()
 			}
 			ImGui::EndMenu();
 		}
+        if (ImGui::BeginMenu("Process"))
+        {
+            ui.menu.process = true;
+			ImGui::EndMenu();
+        }
+
 		ImGui::EndMainMenuBar();
 	}
 }

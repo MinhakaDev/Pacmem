@@ -16,7 +16,7 @@ void ProcessPanel::draw()
     ImGui::SetNextWindowSize(ImVec2(500,450), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetWorkCenter(),ImGuiCond_FirstUseEver);
 
-    ImGui::Begin("Select Process", &showPicker, ImGuiWindowFlags_NoDocking);
+    ImGui::Begin("Select Process", &ui.menu.process, ImGuiWindowFlags_NoDocking);
     std::vector<std::string> names  = sc.getProcessNames();
     if (ImGui::BeginTable("Process List", 1, ImGuiTableFlags_ScrollY, ImVec2(400,300)))
     {
@@ -45,10 +45,6 @@ void ProcessPanel::draw()
         }
         ImGui::EndTable();
     }
-    if (ImGui::Button("Close"))
-    {
-    }
-    ImGui::SameLine(0,20);
     if (ImGui::Button("Connect"))
     {
         sc.processConnect(names[selectedIndex]);
@@ -57,7 +53,7 @@ void ProcessPanel::draw()
     ImGui::SameLine(0,20);
     if (ImGui::Button("Update"))
     {
-
+        sc.updateProcessNames();
     }
 
     ImGui::End();

@@ -22,7 +22,7 @@ class Menu
 		UIContext ui;
 		MemoryScanned memoryScannedPannel{ui,sc};
 		MainPanel mainPanel{ui,sc};
-		MenuPanel menuPanel;
+		MenuPanel menuPanel{ui};
         ProcessPanel processPanel{sc,ui};
  
 		GLFWwindow* window;

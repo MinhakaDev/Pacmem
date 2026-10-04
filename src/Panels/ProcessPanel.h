@@ -11,7 +11,6 @@ class ProcessPanel: public Panel
 	private:
 		Scanner& sc;
         UIContext& ui;
-        bool showPicker{true};
         int selectedIndex;
         float width;
 	public:

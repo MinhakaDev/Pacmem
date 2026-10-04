@@ -28,7 +28,6 @@ bool Menu::update()
     switch (ui.screen)
     {
         case Screen::MAIN:
-            processPanel.draw();
             break;
         case Screen::PROCESS:
             memoryScannedPannel.draw();
@@ -37,6 +36,9 @@ bool Menu::update()
         default:
             break;
     }
+
+    if (ui.menu.process) processPanel.draw();
+    
 
 
 
