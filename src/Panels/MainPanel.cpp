@@ -11,9 +11,7 @@ MainPanel::MainPanel(UIContext& ui, Scanner& sc)
 
 void MainPanel::renderToolbar()
 {
-	const char* types[] = { "int32", "int64", "float", "uintptr_t" };
-	ImGui::Combo("Type", &ui.selectedType, types, IM_ARRAYSIZE(types));
-
+	ImGui::Combo("Type", &ui.selectedType, ui.types, IM_ARRAYSIZE(ui.types));
 }
 
 void MainPanel::renderScanCombo()

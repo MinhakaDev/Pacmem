@@ -14,6 +14,7 @@
 #include "./Panels/MainPanel.h"
 #include "./Panels/MenuPanel.h"
 #include "./Panels/ProcessPanel.h"
+#include "./Panels/AddressListPanel.h"
 
 class Menu
 {
@@ -23,7 +24,8 @@ class Menu
 		MemoryScanned memoryScannedPannel{ui,sc};
 		MainPanel mainPanel{ui,sc};
 		MenuPanel menuPanel{ui};
-        ProcessPanel processPanel{sc,ui};
+		ProcessPanel processPanel{sc,ui};
+		AdressListPanel adressListPanel{ui,sc};
  
 		GLFWwindow* window;
 

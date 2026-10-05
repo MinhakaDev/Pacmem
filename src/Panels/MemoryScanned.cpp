@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "TypeRegistry.h"
 #include "ErrorReporter.h"
+#include <algorithm>
 
 
 
@@ -37,7 +38,13 @@ void MemoryScanned::draw()
 		selectedIndex = i;
 
 	    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+	    {
 		ImGui::OpenPopup("edit_value");
+		if (!std::ranges::contains(ui.adressList,memoryAddrList[i], &AdressEntry::memoryAddr))
+		{
+			ui.adressList.push_back(AdressEntry(memoryAddrList[i], ui.selectedType));
+		}
+	    }
 
 	    ImGui::TableSetColumnIndex(1);
 	    types[ui.selectedType].renderMemoryValue(sc,memoryAddrList[i]);

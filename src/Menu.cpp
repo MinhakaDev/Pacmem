@@ -32,6 +32,7 @@ bool Menu::update()
         case Screen::PROCESS:
             memoryScannedPannel.draw();
             mainPanel.draw();
+	    adressListPanel.draw();
             break;
         default:
             break;
