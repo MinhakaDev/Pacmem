@@ -39,6 +39,7 @@ void ProcessPanel::draw()
                 {
                     sc.processConnect(names[selectedIndex]);
                     ui.screen = Screen::PROCESS;
+		    ui.menu.process = false;
                 }
             }
             ImGui::PopID();

@@ -1,5 +1,6 @@
 #pragma  once
 #include "./Scanner.h"
+#include "ErrorReporter.h"
 #include "imgui.h"
 #include <functional>
 
