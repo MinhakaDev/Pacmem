@@ -29,12 +29,6 @@ class Menu
  
 		GLFWwindow* window;
 
-		int currentPage = 0;
-		int selectedIndex = -1;
-		int selectedType = 0;
-		int scanValue = 0;
-		static const int perPage = 20;
-		char editInput[32];
         void style();
 
 	public:

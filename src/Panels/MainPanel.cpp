@@ -2,6 +2,7 @@
 #include "TypeRegistry.h"
 #include "ErrorReporter.h"
 #include "imgui.h"
+#include "imgui_stdlib.h"
 
 MainPanel::MainPanel(UIContext& ui, Scanner& sc) 
 	:ui(ui),sc(sc)
@@ -29,27 +30,27 @@ void MainPanel::draw()
 	ImGui::Separator();
 	ImGui::Separator();
 	//deletar dps
-	ImGui::InputText("Value", searchInput, sizeof(searchInput));
-	if (ImGui::Button("Scan") && searchInput[0] != '\0') {
+	ImGui::InputText("Value", &searchInput);
+	if (ImGui::Button("Scan") && searchInput.size() != 0) {
 		try
 		{
-			types[ui.selectedType].scanExact(sc,searchInput);
+			types[ui.selectedType].scanExact(sc,searchInput.c_str());
 		} catch (...) {
 			ErrorReporter::warning("Could not scan Memory");
 		}
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("ReScan") && searchInput[0] != '\0') {
+	if (ImGui::Button("ReScan") && searchInput.size() != 0) {
 		try
 		{
 			std::println("button rescan clicked");
-			types[ui.selectedType].rescanExact(sc,searchInput);
+			types[ui.selectedType].rescanExact(sc,searchInput.c_str());
 		} catch (...)
 		{
 			// invalid input, do nothing
 		}
 	}
-	if (ImGui::Button("Unknow") && searchInput[0] != '\0') {
+	if (ImGui::Button("Unknow") && searchInput.size() != 0) {
 		try
 		{
 			types[ui.selectedType].scanUnknown(sc);
@@ -58,7 +59,7 @@ void MainPanel::draw()
 			ErrorReporter::warning("Could not rescan");
 		}
 	}
-	if (ImGui::Button("Lower") && searchInput[0] != '\0') {
+	if (ImGui::Button("Lower") && searchInput.size() != 0) {
 		try
 		{
 			std::println("button rescan clicked");
@@ -68,7 +69,7 @@ void MainPanel::draw()
 			ErrorReporter::warning("Could not rescan Lower");
 		}
 	}
-	if (ImGui::Button("Higher") && searchInput[0] != '\0') {
+	if (ImGui::Button("Higher") && searchInput.size() != 0) {
 		try
 		{
 			types[ui.selectedType].rescanGreater(sc);
@@ -77,7 +78,7 @@ void MainPanel::draw()
 			ErrorReporter::warning("Could not rescan Greater");
 		}
 	}
-	if (ImGui::Button("Same") && searchInput[0] != '\0') {
+	if (ImGui::Button("Same") && searchInput.size() != 0) {
 		try
 		{
 			std::println("Same");
@@ -92,7 +93,7 @@ void MainPanel::draw()
 		}
 	}
 
-	if (ImGui::Button("Changed") && searchInput[0] != '\0') {
+	if (ImGui::Button("Changed") && searchInput.size() != 0) {
 		try
 		{
 			switch (selectedType) {

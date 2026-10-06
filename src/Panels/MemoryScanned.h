@@ -9,7 +9,7 @@ class MemoryScanned : public Panel{
 		UIContext& ui;
 		int selectedIndex = -1;
 		int selectedType = 0;
-		char editInput[32];
+        std::string editInput;
 	public:
 		explicit MemoryScanned(UIContext& ui, Scanner& sc);
 		void draw() override;

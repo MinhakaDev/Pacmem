@@ -1,8 +1,6 @@
 #include "Menu.h"
 #include "Panels/MemoryScanned.h"
 #include "imgui.h"
-#include <cstdint>
-#include <cstdlib>
 #include <print>
 // separate everything into each function
 

@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "TypeRegistry.h"
 #include "ErrorReporter.h"
+#include "imgui_stdlib.h"
 #include <algorithm>
 
 
@@ -52,11 +53,11 @@ void MemoryScanned::draw()
 
 	if (ImGui::BeginPopup("edit_value"))
 	{
-	    ImGui::InputText("New Value", editInput, sizeof(editInput));
+	    ImGui::InputText("New Value", &editInput);
 	    if (ImGui::Button("Write"))
 	    {
 		try {
-			types[ui.selectedType].writeMemory(sc, memoryAddrList[selectedIndex], editInput);
+			types[ui.selectedType].writeMemory(sc, memoryAddrList[selectedIndex], editInput.c_str());
 		} catch (...) {ErrorReporter::warning("Could Not Write to memory");}
 		ImGui::CloseCurrentPopup();
 	    }

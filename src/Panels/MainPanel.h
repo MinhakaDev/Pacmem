@@ -9,8 +9,7 @@ class MainPanel : public Panel{
 		UIContext& ui;
 		int selectedIndex = -1;
 		int selectedType = 0;
-		char editInput[32];
-		char searchInput[32];
+        std::string searchInput;
 		void renderToolbar();
 		void renderScanCombo();
 
