@@ -35,6 +35,7 @@ class Menu
 		int scanValue = 0;
 		static const int perPage = 20;
 		char editInput[32];
+        void style();
 
 	public:
 	Menu();
