@@ -56,7 +56,7 @@ void MemoryScanned::draw()
 	    if (ImGui::Button("Write"))
 	    {
 		try {
-			types[ui.selectedType].writeMemory(sc, selectedIndex, editInput);
+			types[ui.selectedType].writeMemory(sc, memoryAddrList[selectedIndex], editInput);
 		} catch (...) {ErrorReporter::warning("Could Not Write to memory");}
 		ImGui::CloseCurrentPopup();
 	    }

@@ -87,6 +87,7 @@ class Scanner
 			if (tempValue == value) 
 			{
 				newMemoryAddrList.push_back(Scanner::memoryAddrList[i]);
+                changeMemoryValueBefore(memoryAddrList[i], value);
 			}
 		}
 		Scanner::proc.detatch();
@@ -240,12 +241,12 @@ class Scanner
 
 
 	template <typename T>
-	void write(int index, T value)
+	void write(uintptr_t memoryAddr, T value)
 	{
 		std::vector<uint8_t> data(sizeof(T));
 		std::memcpy(data.data(), &value, sizeof(T));
 		Scanner::proc.attatch();
-		proc.writeMemory(Scanner::memoryAddrList[index], data);
+		proc.writeMemory(memoryAddr, data);
 		Scanner::proc.detatch();
 	}
 

@@ -25,7 +25,7 @@ struct AdressEntry
 	std::string description{""};
 	uintptr_t memoryAddr;
 	int type;
-	std::array<uint8_t, 8> value{};
+	std::string value{};
 
 	explicit AdressEntry(uintptr_t memAddr, int type):memoryAddr(memAddr), type(type)
 	{}

@@ -2,6 +2,7 @@
 #include "Scanner.h"
 #include <UIContext.h>
 #include <imgui.h>
+#include <print>
 #include "imgui_stdlib.h"
 #include "TypeRegistry.h"
 
@@ -20,6 +21,7 @@ void AdressListPanel::draw()
 
 void AdressListPanel::renderTable()
 {
+    int toDelete = -1;
 	if (ImGui::BeginTable("addr_list", 6, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY))
 	{
 		ImGui::TableSetupScrollFreeze(0, 1);
@@ -36,12 +38,19 @@ void AdressListPanel::renderTable()
 			ImGui::PushID(i);
 			ImGui::TableNextRow();
 
-	        	ImGui::TableNextColumn();
-			ImGui::Checkbox("##freeze", &entry.frozen);
+            ImGui::TableNextColumn();
+			if(ImGui::Checkbox("##freeze", &entry.frozen))
+            {
+                entry.value = types[entry.type].valueToString(sc,entry.memoryAddr);
+            }
+            if (entry.frozen)
+            {
+                types[entry.type].writeMemory(sc,entry.memoryAddr,entry.value.c_str());
+            }
 
 			ImGui::TableNextColumn();
 			ImGui::SetNextItemWidth(-FLT_MIN);
-		        ImGui::InputText("##desc", &entry.description);
+            ImGui::InputText("##desc", &entry.description);
 
 			ImGui::TableNextColumn();
 			ImGui::SetNextItemWidth(-FLT_MIN);
@@ -52,16 +61,50 @@ void AdressListPanel::renderTable()
 			ImGui::Text("0x%lX", entry.memoryAddr);
 
 			ImGui::TableNextColumn();
-			ImGui::SetNextItemWidth(-FLT_MIN);
-			types[entry.type].renderMemoryValue(sc, entry.memoryAddr);
+
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() - ImGui::GetStyle().FramePadding.y); 
+            std::string valueText = types[entry.type].valueToString(sc, entry.memoryAddr);
+
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(ImGui::GetStyle().ItemSpacing.x, ImGui::GetStyle().CellPadding.y * 2.0f));
+            bool clicked = ImGui::Selectable((valueText + "###value").c_str(), false, ImGuiSelectableFlags_AllowDoubleClick, ImVec2(0, ImGui::GetFrameHeight()));
+            ImGui::PopStyleVar();
+
+            if (clicked && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+            {
+                editInput = valueText;          
+                ImGui::OpenPopup("edit_value");
+            }
+
+            renderPopUp(entry);
 
 			ImGui::TableNextColumn();
-		        if (ImGui::SmallButton("X"));
+		        if (ImGui::SmallButton("X"))
+                    toDelete = i;
 
 			ImGui::PopID();
 		}
 		ImGui::EndTable();
+        if (toDelete != -1)
+            ui.adressList.erase(ui.adressList.begin() + toDelete);
 	}
+}
+
+void AdressListPanel::renderPopUp(AdressEntry& entry)
+{
+    if (ImGui::BeginPopup("edit_value"))
+        {
+            ImGui::InputText("New Value", &editInput);
+            if (ImGui::Button("Write"))
+            {
+            try {
+                types[entry.type].writeMemory(sc, entry.memoryAddr, editInput.c_str());
+            } catch (...) {ErrorReporter::warning("Could Not Write to memory");}
+            ImGui::CloseCurrentPopup();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Cancel")) ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+        }
 }
 
 

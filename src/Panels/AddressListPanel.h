@@ -12,8 +12,9 @@ class AdressListPanel : public Panel{
 		UIContext& ui;
 		int selectedIndex = -1;
 		int selectedType = 0;
-		char editInput[32];
+        std::string editInput;
 		void renderTable();
+        void renderPopUp(AdressEntry& entry);
 	public:
 		explicit AdressListPanel(UIContext& ui, Scanner& sc);
 		void draw() override; };

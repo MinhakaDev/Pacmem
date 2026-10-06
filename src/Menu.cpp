@@ -78,9 +78,9 @@ Menu::Menu()
 	ImGuiIO& io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-    ImGui::StyleColorsDark();           
+    ImGui::StyleColorsDark();
     style();    
-    ImGui::GetStyle().ScaleAllSizes(scale);  
+    ImGui::GetStyle().ScaleAllSizes(scale);
 
     //scaling
     io.Fonts->AddFontFromFileTTF("fonts/Roboto-Medium.ttf", 16.0f * scale);
