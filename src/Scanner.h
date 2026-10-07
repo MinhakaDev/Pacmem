@@ -33,12 +33,24 @@ class Scanner
 		std::unordered_map<uintptr_t, int64_t> memoryValuesBefore;
 		bool firstScan = false;
 	public:
+        bool fastScan = true;
 	Scanner();
+
 	
+
+    template <typename T>
+    size_t scanStep() const
+    {
+        if (fastScan)
+            return sizeof(T);
+        else
+            return 1;
+    }
 
 	template <typename T>
 	bool scanExact(T target)
 	{
+        memoryAddrList.clear();
 		T tempValue = target;
 		if (!Scanner::newScan()) 
 		{
@@ -49,7 +61,7 @@ class Scanner
 		
 		for (int i = 0; snapshotBefore.size() > i ; i++)
 		{
-			for (int j = 0; snapshotBefore[i].bytes.size() > j; j++) 
+			for (size_t j = 0; j + sizeof(T) <= snapshotBefore[i].bytes.size(); j += scanStep<T>())
 			{
 				std::memcpy(&target, snapshotBefore[i].bytes.data() + j,sizeof(target));
 				uintptr_t memoryAddr = snapshotBefore[i].start + j;
@@ -109,7 +121,7 @@ class Scanner
 			for(int i = 0; i < snapshotBefore.size(); i++)
 			{
 				std::println("i = {} de {}",i,snapshotBefore.size());
-				for (int j = 0; j < snapshotBefore[i].bytes.size(); j++ )
+				for (size_t j = 0; j + sizeof(T) <= snapshotBefore[i].bytes.size(); j += scanStep<T>())
 				{
 					if (snapshotBefore[i].start == newSnapshot[i].start)
 					{
@@ -150,7 +162,7 @@ class Scanner
 	template<typename T>
 	bool rescanLower()
 	{
-				if (firstScan)
+		if (firstScan)
 		{
 			std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
 			newScan();
@@ -161,7 +173,7 @@ class Scanner
 			for(int i = 0; i < snapshotBefore.size(); i++)
 			{
 				std::println("i = {} de {}",i,snapshotBefore.size());
-				for (int j = 0; j < snapshotBefore[i].bytes.size(); j++ )
+				for (size_t j = 0; j + sizeof(T) <= snapshotBefore[i].bytes.size(); j += scanStep<T>())
 				{
 					if (snapshotBefore[i].start == newSnapshot[i].start)
 					{
@@ -304,6 +316,13 @@ class Scanner
     std::vector<std::string> getProcessNames();
     void processConnect(std::string procName);
     void updateProcessNames();
+    bool isStatic(uintptr_t memoryAddr);
+    std::vector<uintptr_t> findPointersTo(uintptr_t memoryAddr);
+    std::string findPath(uintptr_t memoryAddr);
+    uintptr_t getBaseFromPath(std::string path);
+    std::vector<MemorySnapshot> getMemorySnapshot();
+    bool isValidAddress(uintptr_t memoryAddr);
+    void refreshMaps() { proc.parceMaps(); }
 };
 
 

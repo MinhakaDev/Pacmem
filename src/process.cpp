@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
-
+#include <unordered_set>
 
 // constructor
 Process::Process()
@@ -85,11 +85,22 @@ bool Process::parceMaps()
 	{
 		return false;
 	} std::string line;
+
+    uintptr_t prevEnd = 0;
+    std::string prevPath;
+    std::unordered_set<std::string> executablePaths;
 	while(std::getline(file, line)) {
 		std::istringstream ss(line);
 		std::string range;
 		std::string perms;
-		ss >> range >> perms;
+		std::string offset;
+		std::string dev;
+		std::string inode;
+		std::string mapsPath;
+        ss >> range >> perms >> offset >> dev >> inode;
+        std::getline(ss >> std::ws, mapsPath);   
+        if (perms.contains("x") && !mapsPath.empty())
+            executablePaths.insert(mapsPath);
 		if (perms.contains("w")) {
 			size_t pos = range.find("-");
 			std::string start = range.substr(0 , pos);
@@ -97,6 +108,19 @@ bool Process::parceMaps()
 			MemoryRegion memory;
 			memory.start = std::stoull(start, nullptr, 16);;
 			memory.end = std::stoull(end, nullptr, 16);
+            memory.path = mapsPath;
+            // get static it need to be a file and writable. or a no name but before static
+            if (mapsPath[0] == '/' && executablePaths.contains(mapsPath))
+            {
+                prevEnd = memory.end;
+                memory.isStatic = true;
+                prevPath = mapsPath;
+            }
+            if (mapsPath.empty() && prevEnd == memory.start)
+            {
+                memory.isStatic = true;
+                memory.path = prevPath;
+            }
 			Process::regions.push_back(memory);
 
 		}
@@ -138,6 +162,46 @@ bool Process::writeMemory(uintptr_t memoryAddr,const std::vector<uint8_t>& buffe
 	return true;
 }
 
+bool Process::isStatic(uintptr_t memoryAddr)
+{
+    for (int i = 0; i < regions.size(); i++)
+    {
+        if (regions[i].start <= memoryAddr && regions[i].end > memoryAddr && regions[i].isStatic)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string Process::getPath(uintptr_t memoryAddr)
+{
+    for (int i = 0; i < regions.size(); i++)
+    {
+        if (regions[i].start <= memoryAddr && regions[i].end > memoryAddr && regions[i].isStatic)
+        {
+            return regions[i].path;
+        }
+    }
+    return "";
+}
+
+uintptr_t Process::getBaseFromPath(std::string path)
+{
+    for (int i = 0; i < regions.size(); i++)
+    {
+        if (regions[i].path == path)
+        {
+            return regions[i].start;
+        }
+    }
+}
+
+bool Process::isValidAddress(uintptr_t memoryAddr)
+{
+    if (regions.empty()) return false;
+    return memoryAddr >= regions.front().start && memoryAddr < regions.back().end;
+}
 
 
 

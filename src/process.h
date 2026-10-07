@@ -6,6 +6,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 #include <sys/ptrace.h>
@@ -18,6 +19,8 @@ struct MemoryRegion
 {
 	uintptr_t start;
 	uintptr_t end;
+    bool isStatic{false};
+    std::string path;
 };
 
 class Process
@@ -42,5 +45,8 @@ class Process
 	void attatch();
 	void detatch();
 
-
+    bool isStatic(uintptr_t memoryAddr);
+    std::string getPath(uintptr_t memoryAddr);
+    uintptr_t getBaseFromPath(std::string path);
+    bool isValidAddress(uintptr_t memoryAddr);
 };
