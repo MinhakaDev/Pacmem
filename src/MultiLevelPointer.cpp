@@ -14,39 +14,40 @@ MultiLevelPointer::MultiLevelPointer(Scanner& sc): sc(sc)
 {
 }
 
-PointerNode MultiLevelPointer::getMultilevelPointer(uintptr_t memAddr, uintptr_t offset, uintptr_t maxDepth, uintptr_t currentDepth)
+std::vector<PointerNode> MultiLevelPointer::getMultilevelPointer(uintptr_t memAddr, uintptr_t offset, uintptr_t maxDepth, uintptr_t currentDepth)
 {
+
     std::string indent(currentDepth * 2, ' ');           // indents by depth, so the output looks like a tree
 
     if (offset == 0)
         std::println("{}[d{}] searching 0x{:X}", indent, currentDepth, memAddr);
 
-    PointerNode pointerNode;
+    std::vector<PointerNode> nodes;
 
     if (offset == 0 && sc.isStatic(memAddr))
     {
+        PointerNode pointerNode;
         pointerNode.found = true;
         pointerNode.path = sc.findPath(memAddr);
         pointerNode.offset.push_back(memAddr - sc.getBaseFromPath(pointerNode.path));
-        return pointerNode;
+        nodes.push_back(pointerNode);
+        return nodes;
     }
-    if (offset > maxOffset || currentDepth >= maxDepth) return pointerNode;
+    if (offset > maxOffset || currentDepth >= maxDepth) return nodes;
     std::vector<uintptr_t> memoryAddrList = findPointersTo(memAddr - offset);
     for (int i = 0; i < memoryAddrList.size(); i++)
     {
-        pointerNode = getMultilevelPointer(memoryAddrList[i], 0, maxDepth,currentDepth+1);
-        if (pointerNode.found == true)
+        std::vector<PointerNode> childChains = getMultilevelPointer(memoryAddrList[i], 0, maxDepth, currentDepth + 1);
+        for(PointerNode& chain : childChains)
         {
-            pointerNode.offset.push_back(offset);
-            return pointerNode;
+            chain.offset.push_back(offset);
+            nodes.push_back(chain);
         }
     }
-    if (pointerNode.found ==true)
-    {
-        return pointerNode;
-    }
-    pointerNode = getMultilevelPointer(memAddr, offset + 8, maxDepth, currentDepth);
-    return pointerNode;
+
+    std::vector<PointerNode> rest = getMultilevelPointer(memAddr, offset + 8, maxDepth, currentDepth);
+    nodes.insert(nodes.end(), rest.begin(), rest.end());
+    return nodes;
 }
 
 std::optional<uintptr_t> MultiLevelPointer::getAdress(std::string path,std::vector<uintptr_t>offset)
@@ -113,14 +114,14 @@ std::vector<uintptr_t> MultiLevelPointer::findPointersTo(uintptr_t memAddr)
 
 }
 
-PointerNode MultiLevelPointer::test(uintptr_t target, uintptr_t maxDepth)
+std::vector<PointerNode> MultiLevelPointer::test(uintptr_t target, uintptr_t maxDepth)
 {
     auto t0 = std::chrono::steady_clock::now();
     sc.newScan();                                              // 1. snapshot
     auto t1 = std::chrono::steady_clock::now();
     table = buildPointerMap();                                 // 2. build table
     auto t2 = std::chrono::steady_clock::now();
-    PointerNode result = getMultilevelPointer(target, 0, maxDepth, 0);   // 3. search
+    std::vector<PointerNode> result = getMultilevelPointer(target, 0, maxDepth, 0);   // 3. search
     auto t3 = std::chrono::steady_clock::now();
 
     auto secs = [](auto a, auto b) { return std::chrono::duration<double>(b - a).count(); };

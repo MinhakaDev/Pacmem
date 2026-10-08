@@ -15,23 +15,10 @@ class MainPanel : public Panel{
 		void renderToolbar();
 		void renderScanCombo();
 
-
-    // resolver
-    std::string chainPath;
-    std::string chainOffsets;
-    std::string resolveStatus;
-
-    // pointer scan
-    std::string scanTarget;
-    int scanDepth = 1;
-    std::string scanStatus;
-    PointerNode lastScan;
-
 	public:
 		explicit MainPanel(UIContext& ui, Scanner& sc);
 		void draw() override;
 
-        MultiLevelPointer mlp;
-        void renderTest();
+
 
 };

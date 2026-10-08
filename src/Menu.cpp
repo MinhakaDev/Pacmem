@@ -1,5 +1,6 @@
 #include "Menu.h"
 #include "Panels/MemoryScanned.h"
+#include "UIContext.h"
 #include "imgui.h"
 #include <print>
 // separate everything into each function
@@ -30,8 +31,11 @@ bool Menu::update()
         case Screen::PROCESS:
             memoryScannedPannel.draw();
             mainPanel.draw();
-	    adressListPanel.draw();
+            adressListPanel.draw();
             break;
+        case Screen::MultiLevelPointer:
+            multiLvelPointerPanel.draw();
+            adressListPanel.draw();
         default:
             break;
     }

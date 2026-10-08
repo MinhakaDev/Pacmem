@@ -17,7 +17,7 @@ void MenuPanel::draw()
 		{
 			if (ImGui::MenuItem("Open"))
 			{
-				std::println("Open Clicado");
+                ui.screen = Screen::MultiLevelPointer;
 			}
 			ImGui::EndMenu();
 		}

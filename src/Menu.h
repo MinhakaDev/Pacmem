@@ -15,6 +15,7 @@
 #include "./Panels/MenuPanel.h"
 #include "./Panels/ProcessPanel.h"
 #include "./Panels/AddressListPanel.h"
+#include "./Panels/MultiLevelPointerPanel.h"
 
 class Menu
 {
@@ -26,7 +27,9 @@ class Menu
 		MenuPanel menuPanel{ui};
 		ProcessPanel processPanel{sc,ui};
 		AdressListPanel adressListPanel{ui,sc};
+        MultiLevelPointerPanel multiLvelPointerPanel{sc,ui};
  
+
 		GLFWwindow* window;
 
         void style();

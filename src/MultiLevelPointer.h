@@ -26,10 +26,10 @@ class MultiLevelPointer
         std::vector<TableContent> table{};
     public:
         explicit MultiLevelPointer(Scanner& sc);
-        PointerNode getMultilevelPointer(uintptr_t memAddr, uintptr_t offset, uintptr_t maxDepth, uintptr_t currentDepth);
+        std::vector<PointerNode> getMultilevelPointer(uintptr_t memAddr, uintptr_t offset, uintptr_t maxDepth, uintptr_t currentDepth);
         std::optional<uintptr_t> getAdress(std::string path,std::vector<uintptr_t>offset);
         std::vector<TableContent> buildPointerMap();
         std::vector<uintptr_t> findPointersTo(uintptr_t memAddr);
-        PointerNode test(uintptr_t target, uintptr_t maxDepth);
+        std::vector<PointerNode> test(uintptr_t target, uintptr_t maxDepth);
 
 };

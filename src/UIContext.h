@@ -9,7 +9,8 @@
 enum class Screen
 {
     MAIN,
-    PROCESS
+    PROCESS,
+    MultiLevelPointer
 };
 
 struct MenuContext
