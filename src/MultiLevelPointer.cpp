@@ -45,7 +45,7 @@ std::vector<PointerNode> MultiLevelPointer::getMultilevelPointer(uintptr_t memAd
         }
     }
 
-    std::vector<PointerNode> rest = getMultilevelPointer(memAddr, offset + 8, maxDepth, currentDepth);
+    std::vector<PointerNode> rest = getMultilevelPointer(memAddr, offset + 4, maxDepth, currentDepth);
     nodes.insert(nodes.end(), rest.begin(), rest.end());
     return nodes;
 }
