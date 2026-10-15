@@ -2,8 +2,6 @@
 #include "MultiLevelPointer.h"
 #include "Panels/Panel.h"
 #include "UIContext.h"
-#include "panel.h"
-#include <curses.h>
 #include <Scanner.h>
 #include <vector>
 
