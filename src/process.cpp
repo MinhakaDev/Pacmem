@@ -21,6 +21,7 @@ Process::Process()
 // retrun all current process names
 void Process::getAllNames()
 {
+	processNames.clear();
 	std::string path = "/proc/";
 	for (const auto& proc : std::filesystem::directory_iterator(path)) 
 	{
