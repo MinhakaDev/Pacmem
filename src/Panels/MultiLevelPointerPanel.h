@@ -17,7 +17,8 @@ class MultiLevelPointerPanel: public Panel
         Scanner& sc;
         MultiLevelPointer mpl;
         std::string scanTarget;
-        int scanDepth{0};
+        int scanDepth{3};
+        int lastScanDepth{3};
         std::vector<PointerNode> nodes{};
         UIContext& ui;
     public:

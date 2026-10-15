@@ -18,11 +18,12 @@ void MultiLevelPointerPanel::draw()
 {
     ImGui::Begin("Multi Level Pointer");
     ImGui::InputText("Target address", &scanTarget);
-    ImGui::SliderInt("Max depth", &scanDepth, 1, 5);
+    ImGui::SliderInt("Max depth", &scanDepth, 0, 6);
     if (ImGui::Button("scan"))
     {
         std::uintptr_t address = static_cast<std::uintptr_t>(std::stoull(scanTarget, nullptr, 0));
-        nodes = mpl.test(address, scanDepth - 1);
+        nodes = mpl.test(address, scanDepth);
+	lastScanDepth = scanDepth + 1;
     }
     ImGui::SameLine();
     if(ImGui::Button("Add To List"))
@@ -56,7 +57,7 @@ void MultiLevelPointerPanel::draw()
                 return std::stoi(a.value) < std::stoi(b.value);
             });
     }
-    renderTable(scanDepth, nodes);
+    renderTable(lastScanDepth, nodes);
     ImGui::End();
 }
 
@@ -65,24 +66,26 @@ void MultiLevelPointerPanel::renderTable(int depth, std::vector<PointerNode>& po
 	if (ImGui::BeginTable("MultiLevelPointers", depth + 1, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_Resizable | ImGuiTableFlags_ScrollY))
     {
          
-		ImGui::TableSetupScrollFreeze(0, 1);
-		ImGui::TableSetupColumn("Path");
-        for (int i = 0; i < depth; i++)
+	ImGui::TableSetupScrollFreeze(0, 1);
+	ImGui::TableSetupColumn("Path");
+
+	ImGui::TableSetupColumn("Base Offset");
+        for (int i = 1; i < depth; i++)
         {
-            std::string label = "offset " + std::to_string(i);
+            std::string label = "offset " +std::to_string(i);
             ImGui::TableSetupColumn(label.c_str());
         }
         ImGui::TableHeadersRow();
 
         for (int i = 0; i < pointers.size(); i++)
         {
-            const PointerNode& pointerNode = pointers[i];
-			ImGui::PushID(i);
-			ImGui::TableNextRow();
+		const PointerNode& pointerNode = pointers[i];
+		ImGui::PushID(i);
+		ImGui::TableNextRow();
 
-            ImGui::TableNextColumn();
-			ImGui::SetNextItemWidth(-FLT_MIN);
-			ImGui::TextUnformatted(pointerNode.path.c_str());
+		ImGui::TableNextColumn();
+		ImGui::SetNextItemWidth(-FLT_MIN);
+		ImGui::TextUnformatted(pointerNode.path.c_str());
 
             for (int j = 0; j < pointerNode.offset.size(); j++)
             {
