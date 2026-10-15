@@ -57,6 +57,7 @@ class Scanner
 			std::println("error 1");
 			return false;
 		}
+		memoryValuesBefore.clear();
 		std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
 		
 		for (int i = 0; snapshotBefore.size() > i ; i++)
@@ -83,6 +84,7 @@ class Scanner
 		{
 			std::println("error 1");
 		}
+		memoryValuesBefore.clear();
 		const std::vector<MemorySnapshot>& snapshotBefore = Scanner::memorySnapshot;
 		firstScan = true;
 		
