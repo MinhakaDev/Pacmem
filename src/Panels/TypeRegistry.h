@@ -14,8 +14,11 @@ struct TypeInfo{
 	void(*scanUnknown)(Scanner&);
 	void(*rescanLower)(Scanner&);
 	void(*rescanGreater)(Scanner&);
+	void(*rescanSame)(Scanner&);
+	void(*rescanChanged)(Scanner&);
 
-    std::string (*valueToString)(Scanner&, uintptr_t memoryAddr);
+        std::string (*valueToString)(Scanner&, uintptr_t memoryAddr);
+
 };
 
 inline const TypeInfo types[] =
@@ -30,7 +33,9 @@ inline const TypeInfo types[] =
 		[](Scanner& sc){sc.scanUnknown<int32_t>();},
 		[](Scanner& sc){sc.rescanLower<int32_t>();},
 		[](Scanner& sc){sc.rescanGreater<int32_t>();},
-        [](Scanner& sc, uintptr_t memoryAddr){return std::format("{}", sc.getMemoryValue<int32_t>(memoryAddr));},
+		[](Scanner& sc){sc.rescanSame<int32_t>();},
+		[](Scanner& sc){sc.rescanChanged<int32_t>();},
+		[](Scanner& sc, uintptr_t memoryAddr){return std::format("{}", sc.getMemoryValue<int32_t>(memoryAddr));},
 		
 	},
 	{
@@ -43,7 +48,9 @@ inline const TypeInfo types[] =
 		[](Scanner& sc){sc.scanUnknown<int64_t>();},
 		[](Scanner& sc){sc.rescanLower<int64_t>();},
 		[](Scanner& sc){sc.rescanGreater<int64_t>();},
-        [](Scanner& sc, uintptr_t memoryAddr){return std::format("{}", sc.getMemoryValue<int64_t>(memoryAddr));},
+		[](Scanner& sc){sc.rescanSame<int64_t>();},
+		[](Scanner& sc){sc.rescanChanged<int64_t>();},
+		[](Scanner& sc, uintptr_t memoryAddr){return std::format("{}", sc.getMemoryValue<int64_t>(memoryAddr));},
 	},
 	{
 		"float",
@@ -55,18 +62,22 @@ inline const TypeInfo types[] =
 		[](Scanner& sc){sc.scanUnknown<float>();},
 		[](Scanner& sc){sc.rescanLower<float>();},
 		[](Scanner& sc){sc.rescanGreater<float>();},
-        [](Scanner& sc, uintptr_t memoryAddr){return std::format("{}", sc.getMemoryValue<float>(memoryAddr));},
+		[](Scanner& sc){sc.rescanSame<float>();},
+		[](Scanner& sc){sc.rescanChanged<float>();},
+		[](Scanner& sc, uintptr_t memoryAddr){return std::format("{}", sc.getMemoryValue<float>(memoryAddr));},
 	},
-    {
-    "uintptr_t",
-    [](Scanner& sc, const char* input){sc.scanExact<uintptr_t>(std::stoull(input, nullptr, 16));},
-    [](Scanner& sc, const char* input){sc.rescanExact<uintptr_t>(std::stoull(input, nullptr, 16));},
-    [](Scanner& sc, uintptr_t memoryAddr, const char* input){sc.write<uintptr_t>(memoryAddr, std::stoll(input, nullptr, 16));},
-    [](Scanner& sc, uintptr_t memoryAddr){sc.getMemoryValue<uintptr_t>(memoryAddr);},
-    [](Scanner& sc, uintptr_t memoryAddr){ImGui::Text("0x%lX",  sc.getMemoryValue<uintptr_t>(memoryAddr));},
-    [](Scanner& sc){sc.scanUnknown<uintptr_t>();},
-    [](Scanner& sc){sc.rescanLower<uintptr_t>();},
-    [](Scanner& sc){sc.rescanGreater<uintptr_t>();},
-    [](Scanner& sc, uintptr_t memoryAddr){return std::format("0x{:X}", sc.getMemoryValue<uintptr_t>(memoryAddr));},
-    },
+	{
+		"uintptr_t",
+	            [](Scanner& sc, const char* input){sc.scanExact<uintptr_t>(std::stoull(input, nullptr, 16));},
+		    [](Scanner& sc, const char* input){sc.rescanExact<uintptr_t>(std::stoull(input, nullptr, 16));},
+		    [](Scanner& sc, uintptr_t memoryAddr, const char* input){sc.write<uintptr_t>(memoryAddr, std::stoll(input, nullptr, 16));},
+		    [](Scanner& sc, uintptr_t memoryAddr){sc.getMemoryValue<uintptr_t>(memoryAddr);},
+		    [](Scanner& sc, uintptr_t memoryAddr){ImGui::Text("0x%lX",  sc.getMemoryValue<uintptr_t>(memoryAddr));},
+		    [](Scanner& sc){sc.scanUnknown<uintptr_t>();},
+		    [](Scanner& sc){sc.rescanLower<uintptr_t>();},
+		    [](Scanner& sc){sc.rescanGreater<uintptr_t>();},
+	            [](Scanner& sc){sc.rescanSame<uintptr_t>();},
+	            [](Scanner& sc){sc.rescanChanged<uintptr_t>();},
+		    [](Scanner& sc, uintptr_t memoryAddr){return std::format("0x{:X}", sc.getMemoryValue<uintptr_t>(memoryAddr));},
+	    },
 };

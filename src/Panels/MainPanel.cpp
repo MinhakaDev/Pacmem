@@ -55,7 +55,7 @@ void MainPanel::draw()
 			types[ui.selectedType].rescanExact(sc,searchInput.c_str());
 		} catch (...)
 		{
-			// invalid input, do nothing
+			ErrorReporter::warning("Could not rescan");
 		}
 	}
 	if (ImGui::Button("Unknow") && searchInput.size() != 0) {
@@ -64,7 +64,7 @@ void MainPanel::draw()
 			types[ui.selectedType].scanUnknown(sc);
 		} catch (...)
 		{
-			ErrorReporter::warning("Could not rescan");
+			ErrorReporter::warning("Could not Unknow");
 		}
 	}
 	if (ImGui::Button("Lower") && searchInput.size() != 0) {
@@ -89,29 +89,21 @@ void MainPanel::draw()
 	if (ImGui::Button("Same") && searchInput.size() != 0) {
 		try
 		{
-			std::println("Same");
-			switch (selectedType) {
-				case 0: sc.rescanSame<int32_t>(); break;
-				case 1: sc.rescanSame<int64_t>(); break;
-				case 2: sc.rescanSame<float>(); break;
-			}
+			types[ui.selectedType].rescanSame(sc);
+			
 		} catch (...) 
 		{
-			// invalid input, do nothing
+			ErrorReporter::warning("Could not rescan Same");
 		}
 	}
 
 	if (ImGui::Button("Changed") && searchInput.size() != 0) {
 		try
 		{
-			switch (selectedType) {
-				case 0: sc.rescanChanged<int32_t>(); break;
-				case 1: sc.rescanChanged<int64_t>(); break;
-				case 2: sc.rescanChanged<float>(); break;
-			}
+			types[ui.selectedType].rescanChanged(sc);
 		} catch (...) 
 		{
-			// invalid input, do nothing
+			ErrorReporter::warning("Could not rescan Changed");
 		}
 	}
    
