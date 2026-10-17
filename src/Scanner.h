@@ -325,6 +325,8 @@ class Scanner
     std::vector<MemorySnapshot> getMemorySnapshot();
     bool isValidAddress(uintptr_t memoryAddr);
     void refreshMaps() { proc.parceMaps(); }
+    void reset();
+
 };
 
 

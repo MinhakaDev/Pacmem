@@ -39,7 +39,8 @@ std::vector<std::string> Scanner::getProcessNames()
 
 void Scanner::processConnect(std::string procName)
 {
-    proc.getId(procName);
+	reset();
+	proc.getId(procName);
 }
 
 void Scanner::updateProcessNames()
@@ -90,4 +91,11 @@ std::vector<MemorySnapshot> Scanner::getMemorySnapshot()
 bool Scanner::isValidAddress(uintptr_t memoryAddr)
 {
     return proc.isValidAddress(memoryAddr);
+}
+void Scanner::reset()
+{
+	memorySnapshot.clear();
+	memoryValuesBefore.clear();
+	memoryAddrList.clear();
+	firstScan = false;
 }
