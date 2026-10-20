@@ -153,6 +153,7 @@ std::vector<uint8_t> Process::readMemory(uintptr_t memoryAddr, size_t size)
 {
 	std::vector<uint8_t> buffer(size);
 	ssize_t bytesRead = pread(mem_fd, buffer.data(), size, memoryAddr);
+	buffer.resize(bytesRead > 0 ? bytesRead : 0);
 	return buffer;
 }
 
