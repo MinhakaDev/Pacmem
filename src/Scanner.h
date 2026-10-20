@@ -117,6 +117,7 @@ class Scanner
 			T before;
 			T after;
 			std::vector<uintptr_t> newMemoryAddrList;
+            proc.attatch();
 			for(int i = 0; i < memorySnapshot.size(); i++)
 			{
 				std::vector<uint8_t> now = proc.readMemory(memorySnapshot[i].start, memorySnapshot[i].bytes.size());
@@ -133,6 +134,7 @@ class Scanner
 					
 				}
 			}
+            proc.detatch();
 			Scanner::memorySnapshot.clear();
 			memoryAddrList = newMemoryAddrList;
 			firstScan = false;
@@ -161,30 +163,27 @@ class Scanner
 	{
 		if (firstScan)
 		{
-			std::vector<MemorySnapshot> snapshotBefore = Scanner::memorySnapshot;
-			newScan();
-			std::vector<MemorySnapshot>& newSnapshot = Scanner::memorySnapshot;
 			T before;
 			T after;
 			std::vector<uintptr_t> newMemoryAddrList;
-			for(int i = 0; i < snapshotBefore.size(); i++)
+            proc.attatch();
+			for(int i = 0; i < memorySnapshot.size(); i++)
 			{
-				std::println("i = {} de {}",i,snapshotBefore.size());
-				for (size_t j = 0; j + sizeof(T) <= snapshotBefore[i].bytes.size(); j += scanStep<T>())
+				std::vector<uint8_t> now = proc.readMemory(memorySnapshot[i].start, memorySnapshot[i].bytes.size());
+				for (size_t j = 0; j + sizeof(T) <= now.size(); j += scanStep<T>())
 				{
-					if (snapshotBefore[i].start == newSnapshot[i].start)
+					std::memcpy(&before, memorySnapshot[i].bytes.data() + j, sizeof(before));
+					std::memcpy(&after, now.data() + j, sizeof(after));
+					uintptr_t memoryAddr = memorySnapshot[i].start + j;
+					if (after < before)
 					{
-						std::memcpy(&before, snapshotBefore[i].bytes.data() + j, sizeof(before));
-						std::memcpy(&after, newSnapshot[i].bytes.data() + j, sizeof(after));
-						uintptr_t memoryAddr = newSnapshot[i].start + j;
-						if (after < before)
-						{
-							newMemoryAddrList.push_back(memoryAddr);
-							saveMemoryValue(memoryAddr, after);
-						}
+						newMemoryAddrList.push_back(memoryAddr);
+						saveMemoryValue(memoryAddr, after);
 					}
+					
 				}
 			}
+            proc.detatch();
 			Scanner::memorySnapshot.clear();
 			memoryAddrList = newMemoryAddrList;
 			firstScan = false;
