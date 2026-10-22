@@ -93,7 +93,7 @@ class Scanner
 	}
 	template <typename T>bool rescanExact(T target)
 	{
-		firstScan = false;
+		if (firstScan) return scanExact(target);
 		T tempValue = target;
 		std::vector<uintptr_t> newMemoryAddrList;
 		Scanner::proc.attatch();
@@ -381,7 +381,6 @@ T getMemoryValueBefore(uintptr_t memoryAddr)
     void reset();
 
 };
-
 
 
 
