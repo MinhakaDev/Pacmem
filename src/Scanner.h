@@ -50,7 +50,8 @@ class Scanner
 	template <typename T>
 	bool scanExact(T target)
 	{
-        memoryAddrList.clear();
+		firstScan = false;
+		memoryAddrList.clear();
 		T tempValue = target;
 		if (!Scanner::newScan()) 
 		{
@@ -79,6 +80,7 @@ class Scanner
 	template<typename T>
 	void scanUnknown()
 	{
+		reset();
 		T tempValue;
 		if (!Scanner::newScan()) 
 		{
@@ -89,19 +91,19 @@ class Scanner
 		firstScan = true;
 		
 	}
-	template <typename T>
-		bool rescanExact(T target)
-		{
-			T tempValue = target;
-			std::vector<uintptr_t> newMemoryAddrList;
-			Scanner::proc.attatch();
+	template <typename T>bool rescanExact(T target)
+	{
+		firstScan = false;
+		T tempValue = target;
+		std::vector<uintptr_t> newMemoryAddrList;
+		Scanner::proc.attatch();
 		for (int i = 0; Scanner::memoryAddrList.size() > i; i++) 
 		{
 			T value = readValue<T>(memoryAddrList[i]);
 			if (tempValue == value) 
 			{
 				newMemoryAddrList.push_back(Scanner::memoryAddrList[i]);
-                changeMemoryValueBefore(memoryAddrList[i], value);
+		changeMemoryValueBefore(memoryAddrList[i], value);
 			}
 		}
 		Scanner::proc.detatch();
@@ -210,6 +212,35 @@ class Scanner
 	template<typename T>
 	bool rescanSame()
 	{
+		if (firstScan)
+		{
+			T before;
+			T after;
+			std::vector<uintptr_t> newMemoryAddrList;
+            proc.attatch();
+			for(int i = 0; i < memorySnapshot.size(); i++)
+			{
+				std::vector<uint8_t> now = proc.readMemory(memorySnapshot[i].start, memorySnapshot[i].bytes.size());
+				for (size_t j = 0; j + sizeof(T) <= now.size(); j += scanStep<T>())
+				{
+					std::memcpy(&before, memorySnapshot[i].bytes.data() + j, sizeof(before));
+					std::memcpy(&after, now.data() + j, sizeof(after));
+					uintptr_t memoryAddr = memorySnapshot[i].start + j;
+					if (after == before)
+					{
+						newMemoryAddrList.push_back(memoryAddr);
+						saveMemoryValue(memoryAddr, after);
+					}
+					
+				}
+			}
+            proc.detatch();
+			Scanner::memorySnapshot.clear();
+			memoryAddrList = newMemoryAddrList;
+			firstScan = false;
+			return true;
+		}
+
 		std::vector<uintptr_t> newMemoryAddrList;
 		Scanner::proc.attatch();
 		for (int i = 0; Scanner::memoryAddrList.size() > i; i++) 
@@ -229,6 +260,34 @@ class Scanner
 	template<typename T>
 	bool rescanChanged()
 	{
+		if (firstScan)
+		{
+			T before;
+			T after;
+			std::vector<uintptr_t> newMemoryAddrList;
+            proc.attatch();
+			for(int i = 0; i < memorySnapshot.size(); i++)
+			{
+				std::vector<uint8_t> now = proc.readMemory(memorySnapshot[i].start, memorySnapshot[i].bytes.size());
+				for (size_t j = 0; j + sizeof(T) <= now.size(); j += scanStep<T>())
+				{
+					std::memcpy(&before, memorySnapshot[i].bytes.data() + j, sizeof(before));
+					std::memcpy(&after, now.data() + j, sizeof(after));
+					uintptr_t memoryAddr = memorySnapshot[i].start + j;
+					if (after != before)
+					{
+						newMemoryAddrList.push_back(memoryAddr);
+						saveMemoryValue(memoryAddr, after);
+					}
+					
+				}
+			}
+            proc.detatch();
+			Scanner::memorySnapshot.clear();
+			memoryAddrList = newMemoryAddrList;
+			firstScan = false;
+			return true;
+		}
 		std::vector<uintptr_t> newMemoryAddrList;
 		Scanner::proc.attatch();
 		for (int i = 0; Scanner::memoryAddrList.size() > i; i++) 
@@ -264,7 +323,7 @@ class Scanner
 	    memoryValuesBefore[memoryAddr] = static_cast<int64_t>(value);
 	}
 	template <typename T>
-	T getMemoryValueBefore(uintptr_t memoryAddr)
+T getMemoryValueBefore(uintptr_t memoryAddr)
 	{
 	    return static_cast<T>(memoryValuesBefore[memoryAddr]);
 	}
